@@ -1,15 +1,19 @@
 # Mask-Guided Discovery of Semantic Manifolds in Generative Models
 
-Mask-Guided Discovery of Semantic Manifolds in Generative Models(https://mengyu.page/files/workshop.pdf)
-  [Mengyu Yang](https://mengyu.page/),
+**[Mask-Guided Discovery of Semantic Manifolds in Generative Models](https://mengyu.page/files/workshop.pdf)**
+  *[Mengyu Yang](https://mengyu.page/),
   [David Rokeby](https://www.cdtps.utoronto.ca/people/directories/all-faculty/david-rokeby),
   [Xavier Snelgrove](https://wxs.ca/)<br>
   BMO Lab for Creative Research, University of Toronto  
-Workshop on Machine Learning for Creativity and Design (NeurIPS), 2020 
+in Workshop on Machine Learning for Creativity and Design (NeurIPS), 2020*
 
 A mask-guided, optimization based approach to learning semantic manifolds in StyleGAN2. Given an initial latent vector, this method finds additional vectors corresponding to the same image but with changes localized within the mask region. 
 
 ![overview figure](figures/overview.png)
+
+## How Does it Work? 
+
+Insert brief explanation here 
 
 ## Usage 
 
@@ -17,7 +21,7 @@ First, download the converted StyleGAN2 checkpoint for its PyTorch implementatio
 
 Dependencies: 
 
-* PyTorch 
+* PyTorch 1.5
 * matplotlib
 * numpy
 * PIL
