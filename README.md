@@ -24,13 +24,9 @@ First, download the converted StyleGAN2 FFHQ checkpoint for its PyTorch implemen
 
 **Dependencies:**
 
-* PyTorch 1.5
-* matplotlib
-* numpy
-* PIL
-* lpips 
-* umap 
-* tqdm 
+The dependencies can be installed as follows:
+
+> pip install -r requirements.txt
 
 ### Generate Vectors 
 
