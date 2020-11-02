@@ -1,3 +1,6 @@
+import sys
+import os 
+
 sys.path.append("stylegan2-pytorch") 
 
 import argparse
@@ -12,7 +15,9 @@ from tqdm import tqdm
 import lpips
 from model import Generator
 
-from gen_figures import gen_imgs_from_latents, gen_umap 
+from PIL import Image 
+import matplotlib.pyplot as plt 
+import umap 
 
 torch.manual_seed(0)
 
@@ -21,37 +26,39 @@ if torch.cuda.is_available():
        
 parser = argparse.ArgumentParser()
 parser.add_argument('--seed_latent', type=str, default=None, 
-                    help='name of initial seed latent vector. If none is given, one will be randomly generated')
+                    help='name of initial seed latent vector. If none is given, one will be randomly generated.')
+parser.add_argument('--checkpoint', type=str, default='stylegan2-ffhq-config-f.pt', 
+                    help='name of the checkpoint file.')
 parser.add_argument('--num_vec', type=int, default=36, 
-                    help='number of vectors to use within the method')
+                    help='number of vectors to use within the method.')
 parser.add_argument('--mask_left', type=int, default=300, 
-                    help='left vertical border of mask region')
+                    help='left vertical border of mask region.')
 parser.add_argument('--mask_right', type=int, default=730, 
-                    help='right vertical border of mask region')
+                    help='right vertical border of mask region.')
 parser.add_argument('--mask_top', type=int, default=680, 
-                    help='top horizontal border of mask region')
+                    help='top horizontal border of mask region.')
 parser.add_argument('--mask_bottom', type=int, default=790, 
-                    help='bottom horizontal border of mask region')
+                    help='bottom horizontal border of mask region.')
 
 parser.add_argument('--alpha', type=float, default=0.3, 
-                    help='weight of the primary spring loss term') # len
+                    help='weight of the primary spring loss term.') # len
 parser.add_argument('--beta', type=float, default=0.1, 
-                    help='weight of the secondary spring loss term') # s_len
+                    help='weight of the secondary spring loss term.') # s_len
 parser.add_argument('--gamma', type=float, default=0.5, 
-                    help='weight of L_X loss term') # L
+                    help='weight of L_X loss term.') # L
 parser.add_argument('--prim_dist', type=float, default=4.0, 
-                    help='value of sigma, the distance between vectors in the primary spring loss term')
-parser.add_argument('--steps', type=int, default=500, 
-                    help='number of optimization epochs, will stop early if gradients become too small')
+                    help='value of sigma, the distance between vectors in the primary spring loss term.')
+parser.add_argument('--steps', type=int, default=2, 
+                    help='number of optimization epochs, will stop early if gradients become too small.')
 parser.add_argument('--offset', type=float, default=0.25, 
-                    help=='value of c, offset value for the mask region')
+                    help='value of c, offset value for the mask region.')
 
-parser.add_argument('--exp_name', type=str, default='masked_gan_exp', 
-                    help='the name of the experiment, used to name the returned files')
+parser.add_argument('--exp_name', type=str, default='masked_gan_exp.', 
+                    help='the name of the experiment, used to name the returned files.')
 parser.add_argument('--gen_imgs', type=bool, default=True, 
-                    help='if True, generates and saves the images corresponding to the vectors in a directory called {exp_name}_imgs')
+                    help='if True, generates and saves the images corresponding to the vectors in a directory called {exp_name}_imgs.')
 parser.add_argument('--gen_umap', type=bool, default=True, 
-                    help='if True, saves plot of UMAP projection of the resulting vectors in a file named {exp_name}_UMAP.png within the current directory')
+                    help='if True, saves plot of UMAP projection of the resulting vectors in a file named {exp_name}_UMAP.png within the current directory.')
 
 
 args = parser.parse_args()
@@ -72,7 +79,11 @@ for noise in noises:
 
 # Load initial seed latent vector
 if args.seed_latent is None:
-    pass
+    # If no seed vector provided, generate a random one 
+    sample_z = torch.randn(1, 512, device=device)
+    _ = g_ema([sample_z], noise=noises, extract_w=True)
+    latent_in = torch.load('rand_w_seed.pt')
+
 else:
     latent_in = torch.load(args.seed_latent)  
 
@@ -81,6 +92,51 @@ targ_img, _ = g_ema([latent_in], input_is_latent=True, noise=noises)
 
 # Initialize perceptual loss 
 percept = lpips.PerceptualLoss(model='net-lin', net='alex', use_gpu=device.startswith('cuda'))
+
+
+def make_image(tensor):
+    tensor = (
+        tensor.detach()
+        .clamp_(min=-1, max=1)
+        .add(1)
+        .div_(2)
+        .mul(255)
+        .type(torch.uint8)
+        .permute(0, 2, 3, 1)
+        .to('cpu')
+        .numpy()
+    )
+    tensor = Image.fromarray(tensor[0])
+    return tensor
+ 
+    
+def gen_imgs_from_latents(latents, g_ema):
+    
+    n = latents.shape[0]
+    
+    if not os.path.exists(f'{args.exp_name}_imgs'):
+        os.makedirs(f'{args.exp_name}_imgs')
+    
+    for i in range(1, n+1, 1): 
+        # Generate image 
+        img,_ = g_ema([latents[int(i-1),:,:].unsqueeze(0)], input_is_latent=True, noise=noises)
+        img = make_image(img)
+        plt.imshow(img)
+        plt.axis('off')
+        plt.savefig(f'./{args.exp_name}_imgs/img{"{:03d}".format(int(i))}.png')
+        plt.close()  
+
+        
+def gen_umap(latents, exp_name):
+    # UMAP analysis 
+    latents_np = latents.detach().cpu().flatten(start_dim=1).numpy() # [n,18,512]
+    reducer = umap.UMAP(random_state=42)
+    embedding = reducer.fit_transform(latents_np)
+    plt.plot(embedding[:,0],embedding[:,1], '-o')
+    plt.title('UMAP Projection of Latent Vectors')
+    plt.savefig(f'{exp_name}_UMAP.png')
+    plt.close()
+
 
 def whole_loss(latent, input_is_latent=True):
 
@@ -115,14 +171,8 @@ def whole_loss(latent, input_is_latent=True):
     
     return args.gamma * unmask_loss, args.gamma * mask_loss
 
-# Use for generating animation along valley floor in w space 
-if __name__ == '__main__':
-    
-    n = args.num_vec   # Number of latent vectors 
-    anim_speed = args.prim_dist 
-    s_anim_speed = anim_speed * 2    
-    
-    def spring_loss(latents):      
+
+def spring_loss(latents):      
         # Create block of latent vectors 1:n
         from_offset = latents[1:,2:8,:]
         
@@ -149,8 +199,15 @@ if __name__ == '__main__':
         s_tot_energy = torch.sum(s_energies, axis=-1)
         
         return args.alpha * tot_energy, args.beta * s_tot_energy
+
     
-   
+# Use for generating animation along valley floor in w space 
+if __name__ == '__main__':
+    
+    n = args.num_vec   # Number of latent vectors 
+    anim_speed = args.prim_dist 
+    s_anim_speed = anim_speed * 2    
+    
     
     # Create batch of n latent vectors, all initialized as the same feature vector - shape: [6, 512, n]
     # Add a bit of noise to all but one of the vectors (that one vector is the original anchor point)
@@ -161,10 +218,11 @@ if __name__ == '__main__':
     noise_weights = torch.randn(n-1,1,1)         
     perturb[1:,2:8,:] = noise * noise_weights
     
-    latents.requires_grad = True 
     if torch.cuda.is_available():
         latents = latents.to(device)
         latents += perturb.to(device)
+
+    latents.requires_grad = True 
         
     # Optimization
     optimizer = optim.LBFGS([latents], history_size=20, max_iter=8)
@@ -222,21 +280,22 @@ if __name__ == '__main__':
     
         # Optimize 
         optimizer.step(closure)
-    
+        
         pbar.set_description((f'L: {L_str:.4f}; len: {length_str:.4f};'
-                              f's_len: {s_length_str:.4f}))
+                              f's_len: {s_length_str:.4f}'))
         
         # Check for and save checkpoint 
         if torch.isnan(latents.grad.norm()).any() or i==args.steps-1: 
-            PATH = f'./{args.exp_name}_latents.pt'
-            torch.save({'latents': prev_latents}, PATH)
+            
+            LATENTS_PATH = f'{args.exp_name}_latents.pt'
+            torch.save(prev_latents, LATENTS_PATH)
             break 
         
         prev_latents = latents.clone().detach()
     
-    
     # Generate images and UMAP figure 
-    latents = torch.load(f'./{args.exp_name}_latents.pt')['latents']
+    latents = torch.load(LATENTS_PATH)
+
     if args.gen_imgs:
         gen_imgs_from_latents(latents, g_ema)
     
