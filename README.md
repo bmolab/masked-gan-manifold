@@ -1,6 +1,11 @@
 # Mask-Guided Discovery of Semantic Manifolds in Generative Models
 
-A mask-guided, optimization based approach to learning semantic manifolds in StyleGAN2. Given an initial latent vector, this method finds additional vectors corresponding to the same image but with changes localized within the mask region. Here's a [link](https://mengyu.page/files/workshop.pdf) to the paper.
+### [Paper](https://mengyu.page/files/workshop.pdf)
+  [Mengyu Yang](https://mengyu.page/),
+  [David Rokeby](https://www.cdtps.utoronto.ca/people/directories/all-faculty/david-rokeby),
+  [Xavier Snelgrove](https://wxs.ca/)<br>
+
+A mask-guided, optimization based approach to learning semantic manifolds in StyleGAN2. Given an initial latent vector, this method finds additional vectors corresponding to the same image but with changes localized within the mask region.
 
 ## Usage 
 
@@ -18,7 +23,7 @@ To see a list of all arguments with explanations:
 
 ### Output Files 
 
-Under the default arguments, once the optimization finishes, the resulting latent vectors will be saved in file `[exp_name]_latents.pt`, the corresponding images will be saved in a new directory called `[exp_name]_imgs`, and a plot of the UMAP projection (https://arxiv.org/abs/1802.03426) of the latent vectors will be saved as `{exp_name}_UMAP.png`. `exp_name` is by default set to `masked_gan_exp` but this can be changed by:
+Under the default arguments, once the optimization finishes, the resulting latent vectors will be saved in file `{exp_name}_latents.pt`, the corresponding images will be saved in a new directory called `{exp_name}_imgs`, and a plot of the UMAP projection (https://arxiv.org/abs/1802.03426) of the latent vectors will be saved as `{exp_name}_UMAP.png`. `exp_name` is by default set to `masked_gan_exp` but this can be changed by:
 
 > python run.py --exp_name {NEW_EXPERIMENT_NAME}
 
@@ -28,7 +33,7 @@ Under the default arguments, once the optimization finishes, the resulting laten
 
 Animation created from images generated using a mask region around the mouth. The mask offset is slowly increased as the animation progresses. 
 
+![UMAP sample](figures/UMAP.png)
 
-
-
+A UMAP projection of output latent vectors. 
 
