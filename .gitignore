@@ -131,4 +131,5 @@ dmypy.json
 # checkpoint files 
 *.pt
 */*.png
+*.png
 
