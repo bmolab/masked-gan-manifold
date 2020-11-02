@@ -19,7 +19,7 @@ def gen_imgs_from_latents(latents, g_ema):
         img,_ = g_ema([latents[int(i-1),:,:].unsqueeze(0)], input_is_latent=True, noise=noises)
         img = make_image(img)
         plt.imshow(img)
-        plt.savefig(f'./imgs/lbfgs/img{"{:03d}".format(int(i))}.png')
+        plt.savefig(f'./{args.exp_name}_imgs/img{"{:03d}".format(int(i))}.png')
         plt.close()  
 
 def gen_umap(latents, exp_name):

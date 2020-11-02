@@ -16,27 +16,43 @@ from gen_figures import gen_imgs_from_latents, gen_umap
 
 torch.manual_seed(0)
 
-device = 'cuda'
+if torch.cuda.is_available():
+    device = 'cuda'
        
 parser = argparse.ArgumentParser()
-parser.add_argument('--seed_latent', type=str)
-parser.add_argument('--num_vec', type=int, default=36)
-parser.add_argument('--mask_left', type=int, default=300)
-parser.add_argument('--mask_right', type=int, default=730)
-parser.add_argument('--mask_top', type=int, default=680)
-parser.add_argument('--mask_bottom', type=int, default=790)
+parser.add_argument('--seed_latent', type=str, default=None, 
+                    help='name of initial seed latent vector. If none is given, one will be randomly generated')
+parser.add_argument('--num_vec', type=int, default=36, 
+                    help='number of vectors to use within the method')
+parser.add_argument('--mask_left', type=int, default=300, 
+                    help='left vertical border of mask region')
+parser.add_argument('--mask_right', type=int, default=730, 
+                    help='right vertical border of mask region')
+parser.add_argument('--mask_top', type=int, default=680, 
+                    help='top horizontal border of mask region')
+parser.add_argument('--mask_bottom', type=int, default=790, 
+                    help='bottom horizontal border of mask region')
 
-parser.add_argument('--alpha', type=float, default=0.3) # len
-parser.add_argument('--beta', type=float, default=0.1) # s_len
-parser.add_argument('--gamma', type=float, default=0.5) # L
-parser.add_argument('--delta', type=float, default=0.1) # repel
-parser.add_argument('--prim_dist', type=float, default=4.0)
-parser.add_argument('--steps', type=int, default=500)
-parser.add_argument('--offset', type=float, default=0.25)
+parser.add_argument('--alpha', type=float, default=0.3, 
+                    help='weight of the primary spring loss term') # len
+parser.add_argument('--beta', type=float, default=0.1, 
+                    help='weight of the secondary spring loss term') # s_len
+parser.add_argument('--gamma', type=float, default=0.5, 
+                    help='weight of L_X loss term') # L
+parser.add_argument('--prim_dist', type=float, default=4.0, 
+                    help='value of sigma, the distance between vectors in the primary spring loss term')
+parser.add_argument('--steps', type=int, default=500, 
+                    help='number of optimization epochs, will stop early if gradients become too small')
+parser.add_argument('--offset', type=float, default=0.25, 
+                    help=='value of c, offset value for the mask region')
 
-parser.add_argument('--exp_name', type=str)
-parser.add_argument('--gen_imgs', type=bool, default=True)
-parser.add_argument('--gen_umap', type=bool, default=True)
+parser.add_argument('--exp_name', type=str, default='masked_gan_exp', 
+                    help='the name of the experiment, used to name the returned files')
+parser.add_argument('--gen_imgs', type=bool, default=True, 
+                    help='if True, generates and saves the images corresponding to the vectors in a directory called {exp_name}_imgs')
+parser.add_argument('--gen_umap', type=bool, default=True, 
+                    help='if True, saves plot of UMAP projection of the resulting vectors in a file named {exp_name}_UMAP.png within the current directory')
+
 
 args = parser.parse_args()
 
@@ -45,7 +61,9 @@ args = parser.parse_args()
 g_ema = Generator(1024, 512, 8)
 g_ema.load_state_dict(torch.load('stylegan2-ffhq-config-f.pt')['g_ema'], strict=False)
 g_ema.eval()
-g_ema = g_ema.to(device)
+
+if torch.cuda.is_available():
+    g_ema = g_ema.to(device)
 
 # Create noise vector 
 noises = g_ema.make_noise()        
@@ -53,7 +71,10 @@ for noise in noises:
     noise.requires_grad = True
 
 # Load initial seed latent vector
-latent_in = torch.load(args.seed_latent)  
+if args.seed_latent is None:
+    pass
+else:
+    latent_in = torch.load(args.seed_latent)  
 
 # Generate the original image to use as target 
 targ_img, _ = g_ema([latent_in], input_is_latent=True, noise=noises)
@@ -127,20 +148,9 @@ if __name__ == '__main__':
         s_energies = (s_lengths - s_anim_speed)**2
         s_tot_energy = torch.sum(s_energies, axis=-1)
         
-        # Repelling term
-        len_mat = (lengths_matrix(latents))**2
-        inv_len_mat = 1/len_mat 
-        inv_len_mat[inv_len_mat == inf] = 0
-        rep_len = inv_len_mat.sum()
-        
-        return args.alpha * tot_energy, args.beta * s_tot_energy, args.delta*rep_len
+        return args.alpha * tot_energy, args.beta * s_tot_energy
     
-    def lengths_matrix(latents):
-        len_mat = np.empty([n,n])
-        for i in range(n):
-            for j in range(n):
-                len_mat[i,j] = torch.sqrt(torch.sum((latents[i,2:8,:] - latents[j,2:8,:])**2)).item()
-        return len_mat 
+   
     
     # Create batch of n latent vectors, all initialized as the same feature vector - shape: [6, 512, n]
     # Add a bit of noise to all but one of the vectors (that one vector is the original anchor point)
@@ -151,10 +161,10 @@ if __name__ == '__main__':
     noise_weights = torch.randn(n-1,1,1)         
     perturb[1:,2:8,:] = noise * noise_weights
     
-    latents += perturb.to(device)
-    
     latents.requires_grad = True 
-    latents = latents.to(device)
+    if torch.cuda.is_available():
+        latents = latents.to(device)
+        latents += perturb.to(device)
         
     # Optimization
     optimizer = optim.LBFGS([latents], history_size=20, max_iter=8)
@@ -162,7 +172,6 @@ if __name__ == '__main__':
     L_str = 0.0
     length_str = 0.0
     s_length_str = 0.0
-    rep_len_str = 0.0
     
     pbar = tqdm(range(args.steps))
     
@@ -172,8 +181,8 @@ if __name__ == '__main__':
             optimizer.zero_grad()
 
             # Calculate and compute grad for primary, secondary, and repel loss   
-            len_loss, s_len_loss, rep_loss = spring_loss(latents)
-            length = len_loss + s_len_loss + rep_loss 
+            len_loss, s_len_loss = spring_loss(latents)
+            length = len_loss + s_len_loss  
             length.backward() 
 
             # Create split copy of latent vectors  
@@ -202,12 +211,10 @@ if __name__ == '__main__':
             global L_str
             global length_str
             global s_length_str
-            global rep_len_str
             
             L_str=(epoch_L/n)
             length_str=(len_loss.item()/n)
             s_length_str=(s_len_loss.item()/n)
-            rep_len_str=(rep_loss.item()/n)          
             
             # Add all losses and return 
             loss = epoch_L + length
@@ -217,7 +224,7 @@ if __name__ == '__main__':
         optimizer.step(closure)
     
         pbar.set_description((f'L: {L_str:.4f}; len: {length_str:.4f};'
-                              f's_len: {s_length_str:.4f}; rep: {rep_len_str:.4f}'))
+                              f's_len: {s_length_str:.4f}))
         
         # Check for and save checkpoint 
         if torch.isnan(latents.grad.norm()).any() or i==args.steps-1: 
@@ -235,4 +242,4 @@ if __name__ == '__main__':
     
     if args.gen_umap: 
         gen_umap(latents, args.exp_name)
-        
+                                  
