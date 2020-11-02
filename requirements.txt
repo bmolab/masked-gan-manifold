@@ -1,0 +1,7 @@
+torch == 1.5.0
+matplotlib 
+numpy 
+Pillow == 7.1.2 
+lpips 
+umap 
+tqdm 

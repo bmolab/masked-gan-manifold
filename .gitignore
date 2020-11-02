@@ -133,4 +133,4 @@ dmypy.json
 */*.png
 *.png
 
-./figures 
+figures/ 

@@ -47,7 +47,7 @@ def gen_imgs_from_latents(latents, g_ema, noises, exp_name):
         # Generate image 
         img,_ = g_ema([latents[int(i-1),:,:].unsqueeze(0)], input_is_latent=True, noise=noises)
         img = make_image(img)
-        img.save(f'./{exp_name}_imgs/img{"{:03d}".format(int(i))}.png')
+        img.save(f'./{exp_name}_imgs/img{i:03d}.png') 
         
         
 def gen_umap(latents, exp_name):
@@ -130,7 +130,7 @@ def spring_loss(latents, layer_start, layer_end):
 if __name__ == '__main__':
     
     torch.manual_seed(0)
-    
+
     if torch.cuda.is_available():
         device = 'cuda'
     
@@ -165,7 +165,7 @@ if __name__ == '__main__':
                         help='weight of L_X loss term.') # L
     parser.add_argument('--prim_dist', type=float, default=4.0, 
                         help='value of sigma, the distance between vectors in the primary spring loss term.')
-    parser.add_argument('--steps', type=int, default=500, 
+    parser.add_argument('--epochs', type=int, default=500, 
                         help='number of optimization epochs, will stop early if gradients become too small.')
     parser.add_argument('--offset', type=float, default=0.25, 
                         help='value of c, offset value for the mask region.')
@@ -208,6 +208,7 @@ if __name__ == '__main__':
     else:
         latent_in = torch.load(args.seed_latent)  
 
+    
     # Generate the original image to use as target 
     targ_img, _ = g_ema([latent_in], input_is_latent=True, noise=noises)
 
@@ -241,7 +242,7 @@ if __name__ == '__main__':
     length_store = 0.0
     s_length_store = 0.0
     
-    pbar = tqdm(range(args.steps))
+    pbar = tqdm(range(args.epochs))
     
     def closure():
         optimizer.zero_grad()
