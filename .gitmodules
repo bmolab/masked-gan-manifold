@@ -1,3 +1,0 @@
-[submodule "stylegan2-pytorch"]
-	path = stylegan2-pytorch
-	url = https://github.com/bmolab/stylegan2-pytorch.git
