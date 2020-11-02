@@ -9,7 +9,7 @@ Workshop on Machine Learning for Creativity and Design (NeurIPS), 2020
 
 A mask-guided, optimization based approach to learning semantic manifolds in StyleGAN2. Given an initial latent vector, this method finds additional vectors corresponding to the same image but with changes localized within the mask region. 
 
-[overview figure](figures/overview.png)
+![overview figure](figures/overview.png)
 
 ## Usage 
 
