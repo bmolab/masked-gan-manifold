@@ -44,9 +44,9 @@ To see a list of all arguments with explanations:
 
 ### Output Files 
 
-Under the default arguments, once the optimization finishes, the resulting latent vectors will be saved in file `{exp_name}_latents.pt`, the corresponding images will be saved in a new directory called `{exp_name}_imgs`, and a plot of the UMAP projection (https://arxiv.org/abs/1802.03426) of the latent vectors will be saved as `{exp_name}_UMAP.png`. `exp_name` is by default set to `masked_gan_exp` but this can be changed by:
+Under the default arguments, once the optimization finishes, the resulting latent vectors will be saved in file `{exp_name}_latents.pt`, the corresponding images will be saved in a new directory called `{exp_name}_imgs`, and a plot of the UMAP projection (https://arxiv.org/abs/1802.03426) of the latent vectors will be saved as `{exp_name}_UMAP.png`. `{exp_name}` is by default set to `masked_gan_exp` but this can be changed by:
 
-> python run.py --exp_name {NEW_EXPERIMENT_NAME}
+> python run.py --exp_name NEW_EXPERIMENT_NAME
 
 ## Output Examples 
 
