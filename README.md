@@ -17,9 +17,9 @@ Insert brief explanation here
 
 ## Usage 
 
-First, download the converted StyleGAN2 checkpoint for its PyTorch implementation [here](https://drive.google.com/file/d/1v0iLBeuaegDZb3BIBb1CSmfsNSRiNWqI/view?usp=sharing) and put it in the same directory as the rest of the code. 
+First, download the converted StyleGAN2 FFHQ checkpoint for its PyTorch implementation [here](https://drive.google.com/file/d/1v0iLBeuaegDZb3BIBb1CSmfsNSRiNWqI/view?usp=sharing) and put it in the same directory as the rest of the code. 
 
-Dependencies: 
+**Dependencies:**
 
 * PyTorch 1.5
 * matplotlib
