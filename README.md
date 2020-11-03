@@ -30,6 +30,8 @@ The dependencies can be installed as follows:
 
 > pip install -r requirements.txt
 
+Note that CUDA 10.1/10.2 is also required to run the code.
+
 ### Generate Vectors 
 
 > python run.py 
