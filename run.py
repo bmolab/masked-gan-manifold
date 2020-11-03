@@ -129,19 +129,19 @@ def spring_loss(latents, layer_start, layer_end):
 # Use for generating animation along valley floor in w space 
 if __name__ == '__main__':
     
-    torch.manual_seed(0)
-
     if torch.cuda.is_available():
         device = 'cuda'
     
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('--seed_latent', type=str, default=None, 
+    parser.add_argument('--latent_seed', type=str, default=None, 
                         help='name of initial seed latent vector. If none is given, one will be randomly generated.')
     parser.add_argument('--checkpoint', type=str, default='stylegan2-ffhq-config-f.pt', 
                         help='name of the checkpoint file.')
     parser.add_argument('--num_vec', type=int, default=36, 
                         help='number of vectors to use within the method.')
+    parser.add_argument('--rand_seed', type=int, default=np.random.randint(0,1000), 
+                        help='random seed used for generating the seed latent vector and noise used by the generator.')
     parser.add_argument('--mask_left', type=int, default=300, 
                         help='left vertical border of mask region.')
     parser.add_argument('--mask_right', type=int, default=730, 
@@ -179,6 +179,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     
+    torch.manual_seed(args.rand_seed)
+    print(f'random seed: {args.rand_seed}')
+
     n = args.num_vec  
     anim_speed = args.prim_dist 
     s_anim_speed = anim_speed * 2  
@@ -199,14 +202,14 @@ if __name__ == '__main__':
         noise.requires_grad = True
 
     # Load initial seed latent vector
-    if args.seed_latent is None:
+    if args.latent_seed is None:
         # If no seed vector provided, generate a random one 
         sample_z = torch.randn(1, 512, device=device)
         _ = g_ema([sample_z], noise=noises, extract_w=True)
         latent_in = torch.load('rand_w_seed.pt')
 
     else:
-        latent_in = torch.load(args.seed_latent)  
+        latent_in = torch.load(args.latent_seed)  
 
     
     # Generate the original image to use as target 
