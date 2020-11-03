@@ -26,6 +26,10 @@ First, download the converted StyleGAN2 FFHQ checkpoint for its PyTorch implemen
 
 **Dependencies:**
 
+After cloning the repo, run:
+
+> git submodule init; git submodule update
+
 The dependencies can be installed as follows:
 
 > pip install -r requirements.txt
