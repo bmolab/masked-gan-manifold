@@ -1,13 +1,10 @@
-torch 
+torch == 1.5.0 
 matplotlib 
 numpy 
 Pillow
 lpips 
 umap 
 tqdm 
-<<<<<<< HEAD
-=======
-scipy
+ninja
 torchvision == 0.6.1
-ninja 
->>>>>>> 23f1ecdc2fa2ea9f7def23b55f116e9cf0c2022a
+scipy 
