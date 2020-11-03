@@ -24,13 +24,9 @@ First, download the converted StyleGAN2 FFHQ checkpoint for its PyTorch implemen
 
 **Dependencies:**
 
-* PyTorch 1.5
-* matplotlib
-* numpy
-* PIL
-* lpips 
-* umap 
-* tqdm 
+The dependencies can be installed as follows:
+
+> pip install -r requirements.txt
 
 ### Generate Vectors 
 
@@ -57,4 +53,16 @@ Animation created from images generated using a mask region around the mouth. Th
 ![UMAP sample](figures/UMAP.png)
 
 A UMAP projection of output latent vectors. 
+
+## Citation
+
+```
+@inproceedings{yang2020mask-guided,
+  title={Mask-Guided Discovery of Semantic Manifolds in Generative Models},
+  author={Mengyu Yang and David Rokeby and Xavier Snelgrove},
+  year={2020},
+  booktitle={NeurIPS 2020 Workshop on Machine Learning for Creativity and Design},
+}
+```
+
 
