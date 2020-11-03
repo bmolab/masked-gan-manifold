@@ -216,8 +216,10 @@ if __name__ == '__main__':
     targ_img, _ = g_ema([latent_in], input_is_latent=True, noise=noises)
 
     # Initialize perceptual loss 
-    percept = lpips.PerceptualLoss(model='net-lin', net='alex', use_gpu=device.startswith('cuda'))
-    
+    percept = lpips.LPIPS(net='alex')
+    percept.cuda()
+
+
     ''' 
     Create batch of n latent vectors, all initialized as the same feature vector - shape: [n, 18, 512]
     Add a bit of noise to all but one of the vectors (that one vector is the original anchor point)
