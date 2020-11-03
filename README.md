@@ -54,3 +54,15 @@ Animation created from images generated using a mask region around the mouth. Th
 
 A UMAP projection of output latent vectors. 
 
+## Citation
+
+```
+@inproceedings{yang2020mask-guided,
+  title={Mask-Guided Discovery of Semantic Manifolds in Generative Models},
+  author={Mengyu Yang and David Rokeby and Xavier Snelgrove},
+  year={2020},
+  booktitle={NeurIPS 2020 Workshop on Machine Learning for Creativity and Design},
+}
+```
+
+
