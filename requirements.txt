@@ -5,3 +5,6 @@ Pillow
 lpips 
 umap 
 tqdm 
+scipy
+torchvision == 0.6.1
+ninja 
