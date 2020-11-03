@@ -7,6 +7,8 @@
   BMO Lab for Creative Research, University of Toronto  
 in Workshop on Machine Learning for Creativity and Design (NeurIPS), 2020*
 
+![overview gif](figures/multi-mask.gif)
+
 A mask-guided, optimization based approach to learning semantic manifolds in StyleGAN2. Given an initial latent vector, this method finds additional vectors corresponding to the same image but with changes localized within the mask region. 
 
 ![overview figure](figures/overview.png)
@@ -27,6 +29,8 @@ First, download the converted StyleGAN2 FFHQ checkpoint for its PyTorch implemen
 The dependencies can be installed as follows:
 
 > pip install -r requirements.txt
+
+Note that CUDA 10.1/10.2 is also required to run the code.
 
 ### Generate Vectors 
 
