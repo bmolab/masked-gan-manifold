@@ -54,21 +54,22 @@ Under the default arguments, once the optimization finishes, the resulting laten
 
 ## Output Examples 
 
+(Below) Animation created from images generated using a mask region around the mouth. The mask offset is slowly increased as the animation progresses. 
+
 ![Boy mouth animation](figures/boy_mouth.gif)
 
-Animation created from images generated using a mask region around the mouth. The mask offset is slowly increased as the animation progresses. 
+(Below) Combining the resulting latent directions from three mask regions using the same face. The bottom right animation is the combined result while the other 3 animations are the results of the individual experiments.  
 
 <img src="https://github.com/bmolab/masked-gan-manifold/blob/main/figures/3-feat-combined.gif" width="600" height="600">
 
-Combining the resulting latent directions from three mask regions using the same face. The bottom right animation is the combined result while the other 3 animations are the results of the individual experiments.  
+(Below) Taking the original result from an experiment as shown in the top left animation and applying the latent directions to other faces.
 
 <img src="https://github.com/bmolab/masked-gan-manifold/blob/main/figures/feat-to-diff-faces.gif" width="600" height="600">
 
-Taking the original result from an experiment as shown in the top left animation and applying the latent directions to other faces. 
+(Below) A UMAP projection of output latent vectors. 
 
 ![UMAP sample](figures/UMAP.png)
 
-A UMAP projection of output latent vectors. 
 
 ## Citation
 
