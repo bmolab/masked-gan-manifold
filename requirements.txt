@@ -1,0 +1,10 @@
+torch == 1.5.0 
+matplotlib 
+numpy 
+Pillow
+lpips 
+umap 
+tqdm 
+ninja
+torchvision == 0.6.1
+scipy 
