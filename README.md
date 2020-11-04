@@ -58,6 +58,14 @@ Under the default arguments, once the optimization finishes, the resulting laten
 
 Animation created from images generated using a mask region around the mouth. The mask offset is slowly increased as the animation progresses. 
 
+![3 feat combined](figures/3-feat-combined.gif){:height="50%" width="50%""}
+
+Combining the resulting latent directions from three mask regions using the same face. The bottom right animation is the combined result while the other 3 animations are the results of the individual experiments.  
+
+![feat to diff faces](figures/feat-to-diff-faces.gif){:height="50%" width="50%""}
+
+Taking the original result from an experiment as shown in the top left animation and applying the latent directions to other faces. 
+
 ![UMAP sample](figures/UMAP.png)
 
 A UMAP projection of output latent vectors. 
