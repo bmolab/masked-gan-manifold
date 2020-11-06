@@ -76,9 +76,9 @@ Under the default arguments, once the optimization finishes, the resulting laten
 ```
 @inproceedings{yang2020mask-guided,
   title={Mask-Guided Discovery of Semantic Manifolds in Generative Models},
-  author={Mengyu Yang and David Rokeby and Xavier Snelgrove},
+  author={Yang, Mengyu and Rokeby, David and Snelgrove, Xavier},
   year={2020},
-  booktitle={NeurIPS 2020 Workshop on Machine Learning for Creativity and Design}
+  booktitle={4th Workshop on Machine Learning for Creativity and Design at NeurIPS 2020}
 }
 ```
 
