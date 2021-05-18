@@ -1,6 +1,6 @@
 # Mask-Guided Discovery of Semantic Manifolds in Generative Models
 
-**[Mask-Guided Discovery of Semantic Manifolds in Generative Models](https://github.com/bmolab/masked-gan-manifold/blob/main/masked-gan-manifold.pdf)**<br>
+**[Mask-Guided Discovery of Semantic Manifolds in Generative Models](https://arxiv.org/abs/2105.07273)**<br>
   *[Mengyu Yang](https://mengyu.page/),
   [David Rokeby](https://www.cdtps.utoronto.ca/people/directories/all-faculty/david-rokeby),
   [Xavier Snelgrove](https://wxs.ca/)<br>
