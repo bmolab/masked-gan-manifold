@@ -190,7 +190,7 @@ if __name__ == '__main__':
     
     # Initialize generator 
     g_ema = Generator(1024, 512, 8)
-    g_ema.load_state_dict(torch.load('stylegan2-ffhq-config-f.pt')['g_ema'], strict=False)
+    g_ema.load_state_dict(torch.load(args.checkpoint)['g_ema'], strict=False)
     g_ema.eval()
 
     if torch.cuda.is_available():
